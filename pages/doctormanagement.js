@@ -1,8 +1,12 @@
 import {useEffect, useState} from "react";
 import LeftNav from "@/components/leftnav";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import {Table} from "react-bootstrap"; // Import the Form component
 
 const apiUrl = 'https://run.mocky.io/v3/341c470d-1830-45fc-a4f3-1ef6c2cf58e0';
-const saveUrl = 'https://enie8qmtr6mi.x.pipedream.net';
+const saveUrl = 'https://jack25.free.beeceptor.com/save';
 const deleteUrl = 'https://enie8qmtr6mi.x.pipedream.net';
 
 
@@ -16,6 +20,8 @@ export default function Home() {
     const [email, setEmail] = useState("");
     const [preference, setPreference] = useState("");
     const [emailToDelete, setEmailToDelete] = useState("");
+    const [validated, setValidated] = useState(false);
+
 
     useEffect(() => {
         fetch(apiUrl)
@@ -31,10 +37,12 @@ export default function Home() {
     const handleEditClick = () => {
         setShowEditWindow(true);
     };
-    const closeEditClick = () => {
-        setShowEditWindow(false);
-    };
-    const handleSaveClick = () => {
+    const handleSaveClick = (event) => {
+        const form = event.currentTarget;
+        if (form.checkValidity() === false) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
         const formData = {
             clinicName: clinicName,
             clinicAddress: clinicAddress,
@@ -42,7 +50,8 @@ export default function Home() {
             email: email,
             preference: preference,
         };
-
+        console.log("===========================================test JSON.stringify(formData)")
+        console.log(JSON.stringify(formData));
         fetch(saveUrl, {
             method: "POST",
             headers: {
@@ -83,7 +92,7 @@ export default function Home() {
         }
     };
 
-    const showDeleteConfirmWindowClick = (email)  => {
+    const showDeleteConfirmWindowClick = (email) => {
         setEmailToDelete(email);
         setShowDeleteConfirmWindow(true);
     };
@@ -95,22 +104,32 @@ export default function Home() {
 
     const sendDeleteRequest = () => {
         closeDeleteConfirmWindow();
-        fetch(deleteUrl + "/" +emailToDelete, {
+        fetch(deleteUrl + "/" + emailToDelete, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
             }
         })
             .then((response) => {
-                if (response.ok){
+                if (response.ok) {
                     console.log("刪除成功");
-                }else {
+                } else {
                     console.log("刪除時發生錯誤: ");
                 }
             })
             .catch((error) => {
                 console.log("發送刪除請求時發生錯誤: ", error)
             });
+    };
+
+    const handleSubmit = (event) => {
+        const form = event.currentTarget;
+        if (form.checkValidity() === false) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        setValidated(true);
     };
 
     return (
@@ -120,7 +139,7 @@ export default function Home() {
                 <div className="card">
                     <div className="card-body">
                         {/* 表格放在這裡 */}
-                        <table className="table table-striped">
+                        <Table striped bordered hover>
                             <thead>
                             <tr>
                                 <th className="text-center">診所名稱</th>
@@ -141,98 +160,108 @@ export default function Home() {
                                     <td className="text-center align-middle">{item.preference}</td>
                                     <td className="text-center align-middle">
                                         <div className="button-container d-grid gap-2 d-md-flex justify-content-center">
-                                            <button className="btn btn-success" type="button"
+                                            <Button className="btn btn-success" type="button"
                                                     onClick={handleEditClick}>編輯
-                                            </button>
-                                            <button className="btn btn-danger" type="button"
+                                            </Button>
+                                            <Button className="btn btn-danger" type="button"
                                                     onClick={() => showDeleteConfirmWindowClick(item.email)}>刪除
-                                            </button>
+                                            </Button>
                                         </div>
                                     </td>
                                 </tr>
                             ))}
                             {/* 其他表格資料類似 */}
                             </tbody>
-                        </table>
+                        </Table>
                     </div>
                 </div>
             </div>
 
             {showEditWindow && (
-                <div className="edit-window">
-                    <h2>編輯醫生</h2>
-                    <form>
-                        <div className="form-group">
-                            <label htmlFor="clinicName">診所名稱</label>
-                            <input
-                                type="text"
-                                id="clinicName"
-                                className="form-contorl"
-                                onChange={handleInputChange}
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="clinicAddress">診所地址</label>
-                            <input
-                                type="text"
-                                id="clinicAddress"
-                                className="form-contorl"
-                                onChange={handleInputChange}
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="doctorName">醫生名稱</label>
-                            <input
-                                type="text"
-                                id="doctorName"
-                                className="form-contorl"
-                                onChange={handleInputChange}
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="email">電郵地址</label>
-                            <input
-                                type="text"
-                                id="email"
-                                className="form-contorl"
-                                onChange={handleInputChange}
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="perference">偏好設定</label>
-                            <input
-                                type="text"
-                                id="perference"
-                                className="form-contorl"
-                                onChange={handleInputChange}
-                            />
-                        </div>
-                        <div className="button-container d-grid gap-2 d-md-flex justify-content-center mt-4">
-                            <button
-                                className="btn btn-primary"
-                                type="button"
-                                onClick={handleSaveClick}>
-                                儲存
-                            </button>
-                            <button
-                                className="btn btn-primary"
-                                type="button"
-                                onClick={closeEditClick}>
-                                取消
-                            </button>
-                        </div>
-                    </form>
+                <div>
+                    <Modal show={showEditWindow} onHide={() => setShowEditWindow(false)}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>編輯醫生</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <Form noValidate validated={validated} onSubmit={handleSubmit}>
+                                <Form.Group controlId="clinicName">
+                                    <Form.Label>診所名稱</Form.Label>
+                                    <Form.Control
+                                        required
+                                        type="text"
+                                        placeholder="clinic name"
+                                        onChange={handleInputChange}
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        Please choose a username.
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                                <Form.Group controlId="clinicAddress">
+                                    <Form.Label>診所地址</Form.Label>
+                                    <Form.Control
+                                        required
+                                        type="text"
+                                        placeholder="clinic address"
+                                        onChange={handleInputChange}
+                                    />
+                                </Form.Group>
+                                <Form.Group controlId="doctorName">
+                                    <Form.Label>醫生名稱</Form.Label>
+                                    <Form.Control
+                                        required
+                                        type="text"
+                                        placeholder="doctor name"
+                                        onChange={handleInputChange}
+                                    />
+                                </Form.Group>
+                                <Form.Group controlId="email">
+                                    <Form.Label>電郵地址</Form.Label>
+                                    <Form.Control
+                                        required
+                                        type="text"
+                                        placeholder="email"
+                                        onChange={handleInputChange}
+                                    />
+                                </Form.Group>
+                                <Form.Group controlId="perference">
+                                    <Form.Label>偏好設定</Form.Label>
+                                    <Form.Control
+                                        required
+                                        type="text"
+                                        placeholder="perference"
+                                        onChange={handleInputChange}
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        Please provide a valid zip.
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+
+                                <div className="button-container d-grid gap-2 d-md-flex justify-content-center mt-4">
+
+                                    <Button
+                                        onClick={handleSaveClick}>確定</Button>
+                                </div>
+                            </Form>
+                        </Modal.Body>
+                    </Modal>
                 </div>
             )}
 
             {showDeleteConfirmWindow && (
-                <div className="delete-confirm-window">
-                    <h2>確定是否刪除？</h2>
-                    <button
-                        onClick={sendDeleteRequest}>確定</button>
-                    <button
-                        onClick={closeDeleteConfirmWindow}>取消
-                    </button>
+                <div>
+                    <Modal show={showDeleteConfirmWindow} onHide={() => setShowDeleteConfirmWindow(false)}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>確認刪除</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <p>你確定要刪除這個項目嗎？</p>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button
+                                onClick={sendDeleteRequest}>確定</Button>
+                        </Modal.Footer>
+                    </Modal>
                 </div>
             )}
         </LeftNav>

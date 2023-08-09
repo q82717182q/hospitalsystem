@@ -1,20 +1,27 @@
 import {useState} from "react";
 import Link from "next/link";
 import LeftNav from "@/components/leftnav";
+import Form from "react-bootstrap/Form";
 
 
 export default function Home() {
     return (
         <LeftNav>
-            {/* 右側內容呈現區塊 */}
-            <div className="col-md-9">
-                <div className="card">
-                    <div className="card-body">
-                            這裡是帳號管理
-
-                    </div>
-                </div>
-            </div>
+            <>
+                <Form.Group className="mb-3">
+                    <Form.Label>Disabled input</Form.Label>
+                    <Form.Control placeholder="Disabled input" disabled />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                    <Form.Label>Disabled select menu</Form.Label>
+                    <Form.Select disabled>
+                        <option>Disabled select</option>
+                    </Form.Select>
+                </Form.Group>
+                <Form.Group className="mb-3">
+                    <Form.Check type="checkbox" label="Can't check this" disabled />
+                </Form.Group>
+            </>
         </LeftNav>
 
     );
