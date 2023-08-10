@@ -28,8 +28,6 @@ export default function Home() {
     const [showEditWindow, setShowEditWindow] = useState(false);
     const [showDeleteConfirmWindow, setShowDeleteConfirmWindow] = useState(false);
     const [emailToDelete, setEmailToDelete] = useState("");
-    const [showAlert, setShowAlert] = useState(false);
-    const alertTimeoutRef = useRef(null);
 
     useEffect(() => {
         fetch(apiUrl)
@@ -42,20 +40,12 @@ export default function Home() {
             });
     }, []);
 
-    useEffect(() => {
-        return () => {
-            if (alertTimeoutRef.current) {
-                clearTimeout(alertTimeoutRef.current);
-            }
-        };
-    }, []);
-
     const handleEditClick = () => {
         setShowEditWindow(true);
     };
     const handleSubmit = async (values) => {
         try {
-            const response = await fetch("https://jack25.free.beeceptor.com/save", {
+            const response = await fetch(saveUrl, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -86,16 +76,23 @@ export default function Home() {
 
     const showDeleteConfirmWindowClick = (email) => {
         setEmailToDelete(email);
-        setShowDeleteConfirmWindow(true);
-    };
-
-    const closeDeleteConfirmWindow = () => {
-        setEmailToDelete("");
-        setShowDeleteConfirmWindow(false);
+        Swal.fire({
+            title: '確認刪除',
+            text: "你確定要刪除這個項目嗎？",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '是的',
+            cancelButtonText: '取消'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                sendDeleteRequest(email);
+            }
+        });
     };
 
     const sendDeleteRequest = () => {
-        closeDeleteConfirmWindow();
         fetch(deleteUrl + "/" + emailToDelete, {
             method: "DELETE",
             headers: {
