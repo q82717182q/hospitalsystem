@@ -1,27 +1,35 @@
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import LeftNav from "@/components/leftnav";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import {Table} from "react-bootstrap"; // Import the Form component
+import {Table} from "react-bootstrap";
+import * as formik from "formik";
+import * as yup from "yup";
+import Swal from "sweetalert2"; // Import the Form component
 
 const apiUrl = 'https://run.mocky.io/v3/341c470d-1830-45fc-a4f3-1ef6c2cf58e0';
 const saveUrl = 'https://jack25.free.beeceptor.com/save';
-const deleteUrl = 'https://enie8qmtr6mi.x.pipedream.net';
+const deleteUrl = 'https://jack25.free.beeceptor.com/delete';
+const uploadCSVUrl = 'https://jack25.free.beeceptor.com/file';
 
 
 export default function Home() {
+    const {Formik} = formik;
+    const schema = yup.object().shape({
+        clinicName: yup.string().required(),
+        clinicAddress: yup.string().required(),
+        doctorName: yup.string().required(),
+        email: yup.string().required(),
+        preference: yup.string().required(),
+    });
+
     const [data, setData] = useState([]);
     const [showEditWindow, setShowEditWindow] = useState(false);
     const [showDeleteConfirmWindow, setShowDeleteConfirmWindow] = useState(false);
-    const [clinicName, setClinicName] = useState("");
-    const [clinicAddress, setClinicAddress] = useState("");
-    const [doctorName, setDoctorName] = useState("");
-    const [email, setEmail] = useState("");
-    const [preference, setPreference] = useState("");
     const [emailToDelete, setEmailToDelete] = useState("");
-    const [validated, setValidated] = useState(false);
-
+    const [showAlert, setShowAlert] = useState(false);
+    const alertTimeoutRef = useRef(null);
 
     useEffect(() => {
         fetch(apiUrl)
@@ -34,62 +42,46 @@ export default function Home() {
             });
     }, []);
 
+    useEffect(() => {
+        return () => {
+            if (alertTimeoutRef.current) {
+                clearTimeout(alertTimeoutRef.current);
+            }
+        };
+    }, []);
+
     const handleEditClick = () => {
         setShowEditWindow(true);
     };
-    const handleSaveClick = (event) => {
-        const form = event.currentTarget;
-        if (form.checkValidity() === false) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-        const formData = {
-            clinicName: clinicName,
-            clinicAddress: clinicAddress,
-            doctorName: doctorName,
-            email: email,
-            preference: preference,
-        };
-        console.log("===========================================test JSON.stringify(formData)")
-        console.log(JSON.stringify(formData));
-        fetch(saveUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(formData),
-        })
-            .then((response) => response.json())
-            .then((responseData) => {
-                console.log("表單資料已成功傳送: ", responseData);
-                setShowEditWindow(false);
-            })
-            .catch((error) => {
-                console.log("傳送表單資料時發生錯誤: ", error)
+    const handleSubmit = async (values) => {
+        try {
+            const response = await fetch("https://jack25.free.beeceptor.com/save", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(values),
             });
-    };
-
-    const handleInputChange = (event) => {
-        const {id, value} = event.target;
-        switch (id) {
-            case "clinicName":
-                setClinicName(value);
-                break;
-            case "clinicAddress":
-                setClinicAddress(value);
-                break;
-            case "doctorName":
-                setDoctorName(value);
-                break;
-            case "email":
-                setEmail(value);
-                break;
-            case "preference":
-                setPreference(value);
-                break;
-            default:
-                break;
+            if (response.ok) {
+                console.log("Form data submitted successfully");
+                const updatedResponse = await fetch(apiUrl);
+                const updatedData = await updatedResponse.json();
+                setData(updatedData);
+                await Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Your work has been saved',
+                    showConfirmButton: true,
+                    timer: 1500,
+                    timerProgressBar: true,
+                })
+            } else {
+                console.error("Failed to submit form data");
+            }
+        } catch (error) {
+            console.error("Error while submitting form:", error);
         }
+        setShowEditWindow(false)
     };
 
     const showDeleteConfirmWindowClick = (email) => {
@@ -122,79 +114,133 @@ export default function Home() {
             });
     };
 
-    const handleSubmit = (event) => {
-        const form = event.currentTarget;
-        if (form.checkValidity() === false) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-
-        setValidated(true);
+    const handleUploadCSV = () => {
+        fileInputRef.current.click();
     };
 
+
+    const handleFileChange = async (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            if (file.type === "text/csv") {
+
+                try {
+                    const formData = new FormData();
+                    formData.append("file", file);
+
+                    const response = await fetch(uploadCSVUrl, {
+                        method: "POST",
+                        body: formData,
+                    });
+
+                    if (response.ok) {
+                        console.log("File uploaded successfully");
+                    } else {
+                        console.error("Failed to upload file");
+                    }
+                } catch (error) {
+                    console.error("Error while uploading file:", error);
+                }
+            } else {
+                console.error("請選擇CSV文件");
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Please choose a CSV file',
+                    timer: 3000,
+                    timerProgressBar: true,
+                });
+            }
+        }
+    };
+
+    const fileInputRef = useRef(null);
     return (
         <LeftNav>
-            {/* 右側內容呈現區塊 */}
             <div>
-                <div className="card">
-                    <div className="card-body">
-                        {/* 表格放在這裡 */}
-                        <Table striped bordered hover>
-                            <thead>
-                            <tr>
-                                <th className="text-center">診所名稱</th>
-                                <th className="text-center">診所地址</th>
-                                <th className="text-center">醫生名稱</th>
-                                <th className="text-center">電郵地址</th>
-                                <th className="text-center">偏好設定</th>
-                                <th className="text-center">編輯</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {data.map((item, index) => (
-                                <tr key={index}>
-                                    <td className="text-center align-middle">{item.name}</td>
-                                    <td className="text-center align-middle">{item.address}</td>
-                                    <td className="text-center align-middle">{item.doctor}</td>
-                                    <td className="text-center align-middle">{item.email}</td>
-                                    <td className="text-center align-middle">{item.preference}</td>
-                                    <td className="text-center align-middle">
-                                        <div className="button-container d-grid gap-2 d-md-flex justify-content-center">
-                                            <Button className="btn btn-success" type="button"
-                                                    onClick={handleEditClick}>編輯
-                                            </Button>
-                                            <Button className="btn btn-danger" type="button"
-                                                    onClick={() => showDeleteConfirmWindowClick(item.email)}>刪除
-                                            </Button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                            {/* 其他表格資料類似 */}
-                            </tbody>
-                        </Table>
+                <div className="mb-3 d-flex justify-content-between align-items-center">
+                    <div className="d-flex align-items-center">
+                        <h2 className="mb-0">醫生管理</h2>
                     </div>
+                    <div className="d-flex align-items-center">
+
+                        <Button
+                            className="btn btn-warning text-white" onClick={() => handleUploadCSV()}>上傳CSV
+                        </Button>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            style={{display: "none"}}
+                            onChange={handleFileChange}
+                        />
+                    </div>
+
                 </div>
+                <Table striped bordered hover>
+                    <thead>
+                    <tr>
+                        <th className="text-center align-middle">診所名稱</th>
+                        <th className="text-center align-middle">診所地址</th>
+                        <th className="text-center align-middle">醫生名稱</th>
+                        <th className="text-center align-middle">電郵地址</th>
+                        <th className="text-center align-middle">偏好設定</th>
+                        <th className="text-center align-middle">編輯</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {data.map((item, index) => (
+                        <tr key={index}>
+                            <td className="text-center align-middle">{item.name}</td>
+                            <td className="text-center align-middle">{item.address}</td>
+                            <td className="text-center align-middle">{item.doctor}</td>
+                            <td className="text-center align-middle">{item.email}</td>
+                            <td className="text-center align-middle">{item.preference}</td>
+                            <td className="text-center align-middle">
+                                <div className="button-container d-grid gap-2 d-md-flex justify-content-center">
+                                    <Button className="btn btn-success" type="button"
+                                            onClick={handleEditClick}>編輯
+                                    </Button>
+                                    <Button className="btn btn-danger" type="button"
+                                            onClick={() => showDeleteConfirmWindowClick(item.email)}>刪除
+                                    </Button>
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
+                    {/* 其他表格資料類似 */}
+                    </tbody>
+                </Table>
             </div>
 
-            {showEditWindow && (
-                <div>
-                    <Modal show={showEditWindow} onHide={() => setShowEditWindow(false)}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>編輯醫生</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <Form noValidate validated={validated} onSubmit={handleSubmit}>
+            <Modal show={showEditWindow} onHide={() => setShowEditWindow(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>編輯醫生</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Formik
+                        validationSchema={schema}
+                        initialValues={{
+                            clinicName: '',
+                            clinicAddress: '',
+                            doctorName: '',
+                            email: '',
+                            preference: '',
+                        }}
+                        onSubmit={handleSubmit}
+                    >
+                        {({handleSubmit, handleChange, values, touched, errors}) => (
+                            <Form noValidate onSubmit={handleSubmit}>
                                 <Form.Group controlId="clinicName">
                                     <Form.Label>診所名稱</Form.Label>
                                     <Form.Control
                                         required
                                         type="text"
-                                        placeholder="clinic name"
-                                        onChange={handleInputChange}
+                                        onChange={handleChange}
+                                        value={values.clinicName}
+                                        isInvalid={touched.clinicName && !!errors.clinicName}
                                     />
                                     <Form.Control.Feedback type="invalid">
-                                        Please choose a username.
+                                        請輸入診所名稱。
                                     </Form.Control.Feedback>
                                 </Form.Group>
                                 <Form.Group controlId="clinicAddress">
@@ -202,69 +248,77 @@ export default function Home() {
                                     <Form.Control
                                         required
                                         type="text"
-                                        placeholder="clinic address"
-                                        onChange={handleInputChange}
+                                        onChange={handleChange}
+                                        value={values.clinicAddress}
+                                        isInvalid={touched.clinicAddress && !!errors.clinicAddress}
                                     />
+                                    <Form.Control.Feedback type="invalid">
+                                        請輸入診所地址。
+                                    </Form.Control.Feedback>
                                 </Form.Group>
                                 <Form.Group controlId="doctorName">
                                     <Form.Label>醫生名稱</Form.Label>
                                     <Form.Control
                                         required
                                         type="text"
-                                        placeholder="doctor name"
-                                        onChange={handleInputChange}
+                                        onChange={handleChange}
+                                        value={values.doctorName}
+                                        isInvalid={touched.doctorName && !!errors.doctorName}
                                     />
+                                    <Form.Control.Feedback type="invalid">
+                                        請輸入醫生名稱。
+                                    </Form.Control.Feedback>
                                 </Form.Group>
                                 <Form.Group controlId="email">
                                     <Form.Label>電郵地址</Form.Label>
                                     <Form.Control
                                         required
                                         type="text"
-                                        placeholder="email"
-                                        onChange={handleInputChange}
+                                        onChange={handleChange}
+                                        value={values.email}
+                                        isInvalid={touched.email && !!errors.email}
                                     />
+                                    <Form.Control.Feedback type="invalid">
+                                        請輸入電郵地址。
+                                    </Form.Control.Feedback>
                                 </Form.Group>
-                                <Form.Group controlId="perference">
+                                <Form.Group controlId="preference">
                                     <Form.Label>偏好設定</Form.Label>
                                     <Form.Control
                                         required
                                         type="text"
-                                        placeholder="perference"
-                                        onChange={handleInputChange}
+                                        onChange={handleChange}
+                                        value={values.preference}
+                                        isInvalid={touched.preference && !!errors.preference}
                                     />
                                     <Form.Control.Feedback type="invalid">
-                                        Please provide a valid zip.
+                                        請輸入偏好設定。
                                     </Form.Control.Feedback>
                                 </Form.Group>
-
-                                <div className="button-container d-grid gap-2 d-md-flex justify-content-center mt-4">
-
-                                    <Button
-                                        onClick={handleSaveClick}>確定</Button>
+                                <div className="d-flex justify-content-end mt-3">
+                                    <Button type="submit">確定</Button>
                                 </div>
-                            </Form>
-                        </Modal.Body>
-                    </Modal>
-                </div>
-            )}
+                            </Form>)}
+                    </Formik>
+                </Modal.Body>
+            </Modal>
 
-            {showDeleteConfirmWindow && (
-                <div>
-                    <Modal show={showDeleteConfirmWindow} onHide={() => setShowDeleteConfirmWindow(false)}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>確認刪除</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <p>你確定要刪除這個項目嗎？</p>
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button
-                                onClick={sendDeleteRequest}>確定</Button>
-                        </Modal.Footer>
-                    </Modal>
-                </div>
-            )}
+            <Modal show={showDeleteConfirmWindow} onHide={() => setShowDeleteConfirmWindow(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>確認刪除</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>你確定要刪除這個項目嗎？</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button
+                        onClick={sendDeleteRequest}>確定</Button>
+                </Modal.Footer>
+            </Modal>
+
+
         </LeftNav>
+
 
     );
 };
