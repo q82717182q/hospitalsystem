@@ -8,7 +8,7 @@ import * as formik from "formik";
 import * as yup from "yup";
 import Swal from "sweetalert2"; // Import the Form component
 
-const apiUrl = 'https://run.mocky.io/v3/341c470d-1830-45fc-a4f3-1ef6c2cf58e0';
+const apiUrl = 'https://run.mocky.io/v3/ab0200f9-d77a-4bb4-ac8b-9c36add02910';
 const saveUrl = 'https://jack25.free.beeceptor.com/save';
 const deleteUrl = 'https://jack25.free.beeceptor.com/delete';
 const uploadCSVUrl = 'https://jack25.free.beeceptor.com/file';
@@ -19,15 +19,16 @@ export default function Home() {
     const schema = yup.object().shape({
         clinicName: yup.string().required(),
         clinicAddress: yup.string().required(),
-        doctorName: yup.string().required(),
+        doctor: yup.string().required(),
         email: yup.string().required(),
         preference: yup.string().required(),
     });
 
     const [data, setData] = useState([]);
     const [showEditWindow, setShowEditWindow] = useState(false);
-    const [showDeleteConfirmWindow, setShowDeleteConfirmWindow] = useState(false);
-    const [emailToDelete, setEmailToDelete] = useState("");
+    const [idToDelete, setIdToDelete] = useState("");
+    const [idToEdit, setIdToEdit] = useState(""); // Added state to track the ID of the row being edited
+
 
     useEffect(() => {
         fetch(apiUrl)
@@ -40,7 +41,8 @@ export default function Home() {
             });
     }, []);
 
-    const handleEditClick = () => {
+    const handleEditClick = (id) => {
+        setIdToEdit(id);
         setShowEditWindow(true);
     };
     const handleSubmit = async (values) => {
@@ -74,8 +76,8 @@ export default function Home() {
         setShowEditWindow(false)
     };
 
-    const showDeleteConfirmWindowClick = (email) => {
-        setEmailToDelete(email);
+    const showDeleteConfirmWindowClick = (id) => {
+        setIdToDelete(id);
         Swal.fire({
             title: '確認刪除',
             text: "你確定要刪除這個項目嗎？",
@@ -87,13 +89,13 @@ export default function Home() {
             cancelButtonText: '取消'
         }).then((result) => {
             if (result.isConfirmed) {
-                sendDeleteRequest(email);
+                sendDeleteRequest();
             }
         });
     };
 
     const sendDeleteRequest = () => {
-        fetch(deleteUrl + "/" + emailToDelete, {
+        fetch(deleteUrl + "/" + idToDelete, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -152,6 +154,8 @@ export default function Home() {
     };
 
     const fileInputRef = useRef(null);
+    const editingData = data.find((item) => item.id === idToEdit);
+
     return (
         <LeftNav>
             <div>
@@ -187,18 +191,18 @@ export default function Home() {
                     <tbody>
                     {data.map((item, index) => (
                         <tr key={index}>
-                            <td className="text-center align-middle">{item.name}</td>
-                            <td className="text-center align-middle">{item.address}</td>
+                            <td className="text-center align-middle">{item.clinicName}</td>
+                            <td className="text-center align-middle">{item.clinicAddress}</td>
                             <td className="text-center align-middle">{item.doctor}</td>
                             <td className="text-center align-middle">{item.email}</td>
                             <td className="text-center align-middle">{item.preference}</td>
                             <td className="text-center align-middle">
                                 <div className="button-container d-grid gap-2 d-md-flex justify-content-center">
                                     <Button className="btn btn-success" type="button"
-                                            onClick={handleEditClick}>編輯
+                                            onClick={() => handleEditClick(item.id)}>編輯
                                     </Button>
                                     <Button className="btn btn-danger" type="button"
-                                            onClick={() => showDeleteConfirmWindowClick(item.email)}>刪除
+                                            onClick={() => showDeleteConfirmWindowClick(item.id)}>刪除
                                     </Button>
                                 </div>
                             </td>
@@ -216,10 +220,10 @@ export default function Home() {
                 <Modal.Body>
                     <Formik
                         validationSchema={schema}
-                        initialValues={{
+                        initialValues={editingData ||{
                             clinicName: '',
                             clinicAddress: '',
-                            doctorName: '',
+                            doctor: '',
                             email: '',
                             preference: '',
                         }}
@@ -253,14 +257,14 @@ export default function Home() {
                                         請輸入診所地址。
                                     </Form.Control.Feedback>
                                 </Form.Group>
-                                <Form.Group controlId="doctorName">
+                                <Form.Group controlId="doctor">
                                     <Form.Label>醫生名稱</Form.Label>
                                     <Form.Control
                                         required
                                         type="text"
                                         onChange={handleChange}
-                                        value={values.doctorName}
-                                        isInvalid={touched.doctorName && !!errors.doctorName}
+                                        value={values.doctor}
+                                        isInvalid={touched.doctor && !!errors.doctor}
                                     />
                                     <Form.Control.Feedback type="invalid">
                                         請輸入醫生名稱。
@@ -299,20 +303,6 @@ export default function Home() {
                     </Formik>
                 </Modal.Body>
             </Modal>
-
-            <Modal show={showDeleteConfirmWindow} onHide={() => setShowDeleteConfirmWindow(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>確認刪除</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <p>你確定要刪除這個項目嗎？</p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button
-                        onClick={sendDeleteRequest}>確定</Button>
-                </Modal.Footer>
-            </Modal>
-
 
         </LeftNav>
 
