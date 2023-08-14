@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import Link from "next/link";
 import LeftNav from "@/components/leftnav";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
@@ -8,15 +7,41 @@ import Swal from "sweetalert2";
 import Modal from "react-bootstrap/Modal";
 import {Formik} from "formik";
 import * as yup from "yup";
+import {Document, Page, pdfjs} from "react-pdf";
+
+
 const apiUrl = 'https://run.mocky.io/v3/ab0200f9-d77a-4bb4-ac8b-9c36add02910';
 const deleteUrl = 'https://jack25.free.beeceptor.com/delete';
+const saveUrl = 'https://jack25.free.beeceptor.com/save';
 
 export default function Home() {
     const [data, setData] = useState([]);
     const [showEditWindow, setShowEditWindow] = useState(false);
-    const [idToDelete, setIdToDelete] = useState("");
     const [idToEdit, setIdToEdit] = useState("");
+    const [showPDFModal, setShowPDFModal] = useState(false);
+    const [selectedPDFUrl, setSelectedPDFUrl] = useState('');
+    const [pageNumber, setPageNumber] = useState(1);
+    useEffect(() => {
+        // 設定 pdf.worker.js 的路徑
+        pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`; // 替換為你的 pdf.worker.js 的路徑
 
+        // 在這裡執行你的其他程式碼
+        // 例如，fetch PDF 資料，設定初始狀態，等等
+    }, []);
+
+    const onPDFLoadSuccess = ({ numPages }) => {
+        console.log('PDF 加载成功，总页数：', numPages);
+    };
+
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const url = URL.createObjectURL(file);
+            setSelectedPDFUrl(url);
+            setPageNumber(1);
+            setShowPDFModal(true);
+        }
+    };
     const schema = yup.object().shape({
         clinicName: yup.string().required(),
         doctor: yup.string().required(),
@@ -72,7 +97,6 @@ export default function Home() {
 
 
     const showDeleteConfirmWindowClick = (id) => {
-        setIdToDelete(id);
         Swal.fire({
             title: '確認刪除',
             text: "你確定要刪除這個項目嗎？",
@@ -90,8 +114,8 @@ export default function Home() {
     };
 
 
-    const sendDeleteRequest = () => {
-        fetch(deleteUrl + "/" + idToDelete, {
+    const sendDeleteRequest = (id) => {
+        fetch(deleteUrl + "/" + id, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -178,6 +202,21 @@ export default function Home() {
                                             readOnly
                                         />
                                     </Form.Group>
+                                    <Form.Group controlId="id">
+                                        <Form.Label>閱覽 PDF 內容 : </Form.Label>
+                                        <input
+                                            type="file"
+                                            accept=".pdf"
+                                            onChange={handleFileChange}
+                                        />
+                                        <Document
+                                            file={selectedPDFUrl}
+                                            onLoadSuccess={onPDFLoadSuccess}
+                                        >
+                                            <Page pageNumber={pageNumber} />
+                                        </Document>
+                                    </Form.Group>
+
                                     <Form.Group controlId="clinicName">
                                         <Form.Label>診所名稱</Form.Label>
                                         <Form.Control
@@ -220,7 +259,8 @@ export default function Home() {
                                     <div className="d-flex justify-content-end mt-3">
                                         <Button type="submit">確定</Button>
                                     </div>
-                                </Form>)}
+                                </Form>
+                            )}
                         </Formik>
                     </Modal.Body>
                 </Modal>

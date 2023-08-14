@@ -177,7 +177,7 @@ export default function Home() {
                     </div>
 
                 </div>
-                <Table striped bordered hover>
+                <Table className="shadow" hover >
                     <thead>
                     <tr>
                         <th className="text-center align-middle">診所名稱</th>
@@ -198,7 +198,7 @@ export default function Home() {
                             <td className="text-center align-middle">{item.preference}</td>
                             <td className="text-center align-middle">
                                 <div className="button-container d-grid gap-2 d-md-flex justify-content-center">
-                                    <Button className="btn btn-success" type="button"
+                                    <Button className="btn btn-success " type="button"
                                             onClick={() => handleEditClick(item.id)}>編輯
                                     </Button>
                                     <Button className="btn btn-danger" type="button"
