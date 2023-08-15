@@ -176,8 +176,8 @@ export default function Home() {
                 </tbody>
 
 
-                <Modal show={showEditWindow} onHide={() => setShowEditWindow(false)}>
-                    <Modal.Header closeButton>
+                <Modal show={showEditWindow} onHide={() => setShowEditWindow(false)} >
+                    <Modal.Header closeButton >
                         <Modal.Title>編輯PDF</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
@@ -189,9 +189,10 @@ export default function Home() {
                                 email: '',
                             }}
                             onSubmit={handleSubmit}
+
                         >
                             {({handleSubmit, handleChange, values, touched, errors}) => (
-                                <Form noValidate onSubmit={handleSubmit}>
+                                <Form noValidate onSubmit={handleSubmit} >
                                     <Form.Group controlId="id">
                                         <Form.Label>ID : </Form.Label>
                                         <Form.Control
@@ -204,17 +205,14 @@ export default function Home() {
                                     </Form.Group>
                                     <Form.Group controlId="id">
                                         <Form.Label>閱覽 PDF 內容 : </Form.Label>
-                                        <input
-                                            type="file"
-                                            accept=".pdf"
-                                            onChange={handleFileChange}
-                                        />
-                                        <Document
-                                            file={selectedPDFUrl}
-                                            onLoadSuccess={onPDFLoadSuccess}
-                                        >
-                                            <Page pageNumber={pageNumber} />
-                                        </Document>
+                                        <div>
+                                            <iframe
+                                                title="Embedded PDF"
+                                                src="http://www.africau.edu/images/default/sample.pdf"
+                                                width="100%"
+                                                height="500px"
+                                            />
+                                        </div>
                                     </Form.Group>
 
                                     <Form.Group controlId="clinicName">
@@ -265,6 +263,7 @@ export default function Home() {
                     </Modal.Body>
                 </Modal>
             </Table>
+
         </LeftNav>
 
     );
