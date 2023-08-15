@@ -8,7 +8,7 @@ import * as formik from "formik";
 import * as yup from "yup";
 import Swal from "sweetalert2"; // Import the Form component
 
-const apiUrl = 'https://run.mocky.io/v3/ab0200f9-d77a-4bb4-ac8b-9c36add02910';
+const apiUrl = 'https://run.mocky.io/v3/b58fe66b-3cb8-475f-8766-09cdceb8563d';
 const saveUrl = 'https://jack25.free.beeceptor.com/save';
 const deleteUrl = 'https://jack25.free.beeceptor.com/delete';
 const uploadCSVUrl = 'https://jack25.free.beeceptor.com/file';
@@ -157,8 +157,8 @@ export default function Home() {
     const editingData = data.find((item) => item.id === idToEdit);
 
     return (
-        <LeftNav>
-            <div>
+        <LeftNav >
+            <div >
                 <div className="mb-3 d-flex justify-content-between align-items-center">
                     <div className="d-flex align-items-center">
                         <h2 className="mb-0">醫生管理</h2>

@@ -7,57 +7,44 @@ import Swal from "sweetalert2";
 import Modal from "react-bootstrap/Modal";
 import {Formik} from "formik";
 import * as yup from "yup";
-import {Document, Page, pdfjs} from "react-pdf";
+import Select from "react-select";
 
 
-const apiUrl = 'https://run.mocky.io/v3/ab0200f9-d77a-4bb4-ac8b-9c36add02910';
+const apiUrl = 'https://run.mocky.io/v3/b58fe66b-3cb8-475f-8766-09cdceb8563d';
 const deleteUrl = 'https://jack25.free.beeceptor.com/delete';
 const saveUrl = 'https://jack25.free.beeceptor.com/save';
 
 export default function Home() {
     const [data, setData] = useState([]);
-    const [showEditWindow, setShowEditWindow] = useState(false);
+    const [doctorNames, setDoctorNames] = useState([]);
     const [idToEdit, setIdToEdit] = useState("");
-    const [showPDFModal, setShowPDFModal] = useState(false);
-    const [selectedPDFUrl, setSelectedPDFUrl] = useState('');
-    const [pageNumber, setPageNumber] = useState(1);
-    useEffect(() => {
-        // 設定 pdf.worker.js 的路徑
-        pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`; // 替換為你的 pdf.worker.js 的路徑
-
-        // 在這裡執行你的其他程式碼
-        // 例如，fetch PDF 資料，設定初始狀態，等等
-    }, []);
-
-    const onPDFLoadSuccess = ({ numPages }) => {
-        console.log('PDF 加载成功，总页数：', numPages);
-    };
-
-    const handleFileChange = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const url = URL.createObjectURL(file);
-            setSelectedPDFUrl(url);
-            setPageNumber(1);
-            setShowPDFModal(true);
-        }
-    };
+    const [isValidSubmit, setIsValidSubmit] = useState(false);
+    const [showEditWindow, setShowEditWindow] = useState(false);
+    const [selectedDoctor, setSelectedDoctor] = useState(null);  // 創建狀態
+    const editData = data.find((item) => item.id === idToEdit);
     const schema = yup.object().shape({
         clinicName: yup.string().required(),
         doctor: yup.string().required(),
         email: yup.string().required(),
     });
 
+
     useEffect(() => {
         fetch(apiUrl)
             .then((response) => response.json())
             .then((responseData) => {
                 setData(responseData);
+                const uniqueDoctorNames = [...new Set(responseData.map(item => item.doctor))];
+                setDoctorNames(uniqueDoctorNames);
             })
             .catch((error) => {
                 console.log("Error fetching data:", error);
             });
     }, []);
+
+    useEffect(() => {
+        setIsValidSubmit(selectedDoctor ? true : false);
+    }, [selectedDoctor]);
 
     const handleEditClick = (id) => {
         setShowEditWindow(true);
@@ -133,7 +120,10 @@ export default function Home() {
             });
     };
 
-    const editData = data.find((item) => item.id === idToEdit);
+    const handleModalClose = () => {
+        setSelectedDoctor(null); 
+        setShowEditWindow(false);
+    }
 
     return (
         <LeftNav>
@@ -144,7 +134,7 @@ export default function Home() {
                     </div>
                 </div>
             </div>
-            <Table striped bordered hover>
+            <Table hover>
                 <thead>
                 <tr>
                     <th className="text-center align-middle">ID</th>
@@ -176,8 +166,8 @@ export default function Home() {
                 </tbody>
 
 
-                <Modal show={showEditWindow} onHide={() => setShowEditWindow(false)} >
-                    <Modal.Header closeButton >
+                <Modal show={showEditWindow} onHide={() => handleModalClose()}>
+                    <Modal.Header closeButton>
                         <Modal.Title>編輯PDF</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
@@ -192,7 +182,7 @@ export default function Home() {
 
                         >
                             {({handleSubmit, handleChange, values, touched, errors}) => (
-                                <Form noValidate onSubmit={handleSubmit} >
+                                <Form noValidate onSubmit={handleSubmit}>
                                     <Form.Group controlId="id">
                                         <Form.Label>ID : </Form.Label>
                                         <Form.Control
@@ -203,7 +193,7 @@ export default function Home() {
                                             readOnly
                                         />
                                     </Form.Group>
-                                    <Form.Group controlId="id">
+                                    <Form.Group controlId="pdf">
                                         <Form.Label>閱覽 PDF 內容 : </Form.Label>
                                         <div>
                                             <iframe
@@ -230,16 +220,22 @@ export default function Home() {
                                     </Form.Group>
                                     <Form.Group controlId="doctor">
                                         <Form.Label>醫生名稱</Form.Label>
-                                        <Form.Control
-                                            required
-                                            type="text"
-                                            onChange={handleChange}
-                                            value={values.doctor}
-                                            isInvalid={touched.doctor && !!errors.doctor}
+                                        <Select
+                                            options={doctorNames.map(doctorName => ({
+                                                value: doctorName,
+                                                label: doctorName
+                                            }))}
+                                            onChange={option => {
+                                                setSelectedDoctor(option.value);
+                                                handleChange({target: {id: "doctor", value: option.value}});
+                                            }}
+                                            value={selectedDoctor ? {
+                                                value: selectedDoctor,
+                                                label: selectedDoctor
+                                            } : null}
+                                            isSearchable={true}
+                                            placeholder="選擇醫生名稱..."
                                         />
-                                        <Form.Control.Feedback type="invalid">
-                                            請輸入醫生名稱。
-                                        </Form.Control.Feedback>
                                     </Form.Group>
                                     <Form.Group controlId="email">
                                         <Form.Label>電郵地址</Form.Label>
@@ -255,7 +251,7 @@ export default function Home() {
                                         </Form.Control.Feedback>
                                     </Form.Group>
                                     <div className="d-flex justify-content-end mt-3">
-                                        <Button type="submit">確定</Button>
+                                        <Button type="submit" disabled={!isValidSubmit}>確定</Button>
                                     </div>
                                 </Form>
                             )}
