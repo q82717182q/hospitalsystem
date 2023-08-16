@@ -10,17 +10,17 @@ import * as yup from "yup";
 import Select from "react-select";
 
 
-const apiUrl = 'https://run.mocky.io/v3/b58fe66b-3cb8-475f-8766-09cdceb8563d';
+const apiUrl = 'https://run.mocky.io/v3/99530074-98e5-411a-836a-ce7b0d32d533';
 const deleteUrl = 'https://jack25.free.beeceptor.com/delete';
 const saveUrl = 'https://jack25.free.beeceptor.com/save';
 
-export default function Home() {
+export default function PdfManagement() {
     const [data, setData] = useState([]);
     const [doctorNames, setDoctorNames] = useState([]);
     const [idToEdit, setIdToEdit] = useState("");
     const [isValidSubmit, setIsValidSubmit] = useState(false);
     const [showEditWindow, setShowEditWindow] = useState(false);
-    const [selectedDoctor, setSelectedDoctor] = useState(null);  // 創建狀態
+    const [selectedDoctor, setSelectedDoctor] = useState(null);
     const editData = data.find((item) => item.id === idToEdit);
     const schema = yup.object().shape({
         clinicName: yup.string().required(),
@@ -41,10 +41,6 @@ export default function Home() {
                 console.log("Error fetching data:", error);
             });
     }, []);
-
-    useEffect(() => {
-        setIsValidSubmit(selectedDoctor ? true : false);
-    }, [selectedDoctor]);
 
     const handleEditClick = (id) => {
         setShowEditWindow(true);
@@ -121,7 +117,7 @@ export default function Home() {
     };
 
     const handleModalClose = () => {
-        setSelectedDoctor(null); 
+        setSelectedDoctor(null);
         setShowEditWindow(false);
     }
 
@@ -183,7 +179,7 @@ export default function Home() {
                         >
                             {({handleSubmit, handleChange, values, touched, errors}) => (
                                 <Form noValidate onSubmit={handleSubmit}>
-                                    <Form.Group controlId="id">
+                                    <Form.Group className="mb-3" controlId="id">
                                         <Form.Label>ID : </Form.Label>
                                         <Form.Control
                                             type="text"
@@ -193,7 +189,7 @@ export default function Home() {
                                             readOnly
                                         />
                                     </Form.Group>
-                                    <Form.Group controlId="pdf">
+                                    <Form.Group className="mb-3" controlId="pdf">
                                         <Form.Label>閱覽 PDF 內容 : </Form.Label>
                                         <div>
                                             <iframe
@@ -205,7 +201,7 @@ export default function Home() {
                                         </div>
                                     </Form.Group>
 
-                                    <Form.Group controlId="clinicName">
+                                    <Form.Group className="mb-3" controlId="clinicName">
                                         <Form.Label>診所名稱</Form.Label>
                                         <Form.Control
                                             required
@@ -218,7 +214,7 @@ export default function Home() {
                                             請輸入診所名稱。
                                         </Form.Control.Feedback>
                                     </Form.Group>
-                                    <Form.Group controlId="doctor">
+                                    <Form.Group className="mb-3" controlId="doctor">
                                         <Form.Label>醫生名稱</Form.Label>
                                         <Select
                                             options={doctorNames.map(doctorName => ({
@@ -232,12 +228,15 @@ export default function Home() {
                                             value={selectedDoctor ? {
                                                 value: selectedDoctor,
                                                 label: selectedDoctor
-                                            } : null}
+                                            } : {
+                                                value: editData.doctor,
+                                                label: editData.doctor
+                                            }}
                                             isSearchable={true}
                                             placeholder="選擇醫生名稱..."
                                         />
                                     </Form.Group>
-                                    <Form.Group controlId="email">
+                                    <Form.Group className="mb-3" controlId="email">
                                         <Form.Label>電郵地址</Form.Label>
                                         <Form.Control
                                             required
@@ -251,7 +250,7 @@ export default function Home() {
                                         </Form.Control.Feedback>
                                     </Form.Group>
                                     <div className="d-flex justify-content-end mt-3">
-                                        <Button type="submit" disabled={!isValidSubmit}>確定</Button>
+                                        <Button type="submit" >確定</Button>
                                     </div>
                                 </Form>
                             )}

@@ -8,13 +8,13 @@ import * as formik from "formik";
 import * as yup from "yup";
 import Swal from "sweetalert2"; // Import the Form component
 
-const apiUrl = 'https://run.mocky.io/v3/b58fe66b-3cb8-475f-8766-09cdceb8563d';
+const apiUrl = 'https://run.mocky.io/v3/99530074-98e5-411a-836a-ce7b0d32d533';
 const saveUrl = 'https://jack25.free.beeceptor.com/save';
 const deleteUrl = 'https://jack25.free.beeceptor.com/delete';
 const uploadCSVUrl = 'https://jack25.free.beeceptor.com/file';
 
 
-export default function Home() {
+export default function DoctorManagement() {
     const {Formik} = formik;
     const schema = yup.object().shape({
         clinicName: yup.string().required(),
@@ -231,7 +231,7 @@ export default function Home() {
                     >
                         {({handleSubmit, handleChange, values, touched, errors}) => (
                             <Form noValidate onSubmit={handleSubmit}>
-                                <Form.Group controlId="clinicName">
+                                <Form.Group className="mb-3" controlId="clinicName">
                                     <Form.Label>診所名稱</Form.Label>
                                     <Form.Control
                                         required
@@ -244,7 +244,7 @@ export default function Home() {
                                         請輸入診所名稱。
                                     </Form.Control.Feedback>
                                 </Form.Group>
-                                <Form.Group controlId="clinicAddress">
+                                <Form.Group className="mb-3" controlId="clinicAddress">
                                     <Form.Label>診所地址</Form.Label>
                                     <Form.Control
                                         required
@@ -257,7 +257,7 @@ export default function Home() {
                                         請輸入診所地址。
                                     </Form.Control.Feedback>
                                 </Form.Group>
-                                <Form.Group controlId="doctor">
+                                <Form.Group className="mb-3" controlId="doctor">
                                     <Form.Label>醫生名稱</Form.Label>
                                     <Form.Control
                                         required
@@ -270,7 +270,7 @@ export default function Home() {
                                         請輸入醫生名稱。
                                     </Form.Control.Feedback>
                                 </Form.Group>
-                                <Form.Group controlId="email">
+                                <Form.Group className="mb-3" controlId="email">
                                     <Form.Label>電郵地址</Form.Label>
                                     <Form.Control
                                         required
@@ -283,7 +283,7 @@ export default function Home() {
                                         請輸入電郵地址。
                                     </Form.Control.Feedback>
                                 </Form.Group>
-                                <Form.Group controlId="preference">
+                                <Form.Group className="mb-3" controlId="preference">
                                     <Form.Label>偏好設定</Form.Label>
                                     <Form.Control
                                         required

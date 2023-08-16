@@ -1,0 +1,222 @@
+[
+  {
+    "id": 1,
+    "clinicName": "Clinic1",
+    "clinicAddress": "clinicAddress1",
+    "doctor": "Doctor1",
+    "email": "doctor1@example.com",
+    "preference": "Preference1",
+    "role": "admin",
+    "isValid": true,
+    "accountName": "accountName1"
+  },
+  {
+    "id": 2,
+    "clinicName": "Clinic2",
+    "clinicAddress": "clinicAddress2",
+    "doctor": "Doctor2",
+    "email": "doctor2@example.com",
+    "preference": "Preference2",
+    "role": "user",
+    "isValid": false,
+    "accountName": "accountName2"
+  },
+  {
+    "id": 3,
+    "clinicName": "Clinic3",
+    "clinicAddress": "clinicAddress3",
+    "doctor": "Doctor3",
+    "email": "doctor3@example.com",
+    "preference": "Preference3",
+    "role": "user",
+    "isValid": true,
+    "accountName": "accountName3"
+  },
+  {
+    "id": 4,
+    "clinicName": "Clinic4",
+    "clinicAddress": "clinicAddress4",
+    "doctor": "Doctor4",
+    "email": "doctor4@example.com",
+    "preference": "Preference4",
+    "role": "admin",
+    "isValid": false,
+    "accountName": "accountName4"
+  },
+  {
+    "id": 5,
+    "clinicName": "Clinic5",
+    "clinicAddress": "clinicAddress5",
+    "doctor": "Doctor5",
+    "email": "doctor5@example.com",
+    "preference": "Preference5",
+    "role": "user",
+    "isValid": true,
+    "accountName": "accountName5"
+  },
+  {
+    "id": 6,
+    "clinicName": "Clinic6",
+    "clinicAddress": "clinicAddress6",
+    "doctor": "Doctor6",
+    "email": "doctor6@example.com",
+    "preference": "Preference6",
+    "role": "admin",
+    "isValid": true,
+    "accountName": "accountName6"
+  },
+  {
+    "id": 7,
+    "clinicName": "Clinic7",
+    "clinicAddress": "clinicAddress7",
+    "doctor": "Doctor7",
+    "email": "doctor7@example.com",
+    "preference": "Preference7",
+    "role": "user",
+    "isValid": false,
+    "accountName": "accountName7"
+  },
+  {
+    "id": 8,
+    "clinicName": "Clinic8",
+    "clinicAddress": "clinicAddress8",
+    "doctor": "Doctor8",
+    "email": "doctor8@example.com",
+    "preference": "Preference8",
+    "role": "admin",
+    "isValid": true,
+    "accountName": "accountName8"
+  },
+  {
+    "id": 9,
+    "clinicName": "Clinic9",
+    "clinicAddress": "clinicAddress9",
+    "doctor": "Doctor9",
+    "email": "doctor9@example.com",
+    "preference": "Preference9",
+    "role": "user",
+    "isValid": true,
+    "accountName": "accountName9"
+  },
+  {
+    "id": 10,
+    "clinicName": "Clinic10",
+    "clinicAddress": "clinicAddress10",
+    "doctor": "Doctor10",
+    "email": "doctor10@example.com",
+    "preference": "Preference10",
+    "role": "user",
+    "isValid": false,
+    "accountName": "accountName10"
+  },
+  {
+    "id": 11,
+    "clinicName": "Clinic11",
+    "clinicAddress": "clinicAddress11",
+    "doctor": "Doctor11",
+    "email": "doctor11@example.com",
+    "preference": "Preference11",
+    "role": "admin",
+    "isValid": true,
+    "accountName": "accountName11"
+  },
+  {
+    "id": 12,
+    "clinicName": "Clinic12",
+    "clinicAddress": "clinicAddress12",
+    "doctor": "Doctor12",
+    "email": "doctor12@example.com",
+    "preference": "Preference12",
+    "role": "user",
+    "isValid": true,
+    "accountName": "accountName12"
+  },
+  {
+    "id": 13,
+    "clinicName": "Clinic13",
+    "clinicAddress": "clinicAddress13",
+    "doctor": "Doctor13",
+    "email": "doctor13@example.com",
+    "preference": "Preference13",
+    "role": "user",
+    "isValid": false,
+    "accountName": "accountName13"
+  },
+  {
+    "id": 14,
+    "clinicName": "Clinic14",
+    "clinicAddress": "clinicAddress14",
+    "doctor": "Doctor14",
+    "email": "doctor14@example.com",
+    "preference": "Preference14",
+    "role": "admin",
+    "isValid": true,
+    "accountName": "accountName14"
+  },
+  {
+    "id": 15,
+    "clinicName": "Clinic15",
+    "clinicAddress": "clinicAddress15",
+    "doctor": "Doctor15",
+    "email": "doctor15@example.com",
+    "preference": "Preference15",
+    "role": "user",
+    "isValid": true,
+    "accountName": "accountName15"
+  },
+  {
+    "id": 16,
+    "clinicName": "Clinic16",
+    "clinicAddress": "clinicAddress16",
+    "doctor": "Doctor16",
+    "email": "doctor16@example.com",
+    "preference": "Preference16",
+    "role": "admin",
+    "isValid": false,
+    "accountName": "accountName16"
+  },
+  {
+    "id": 17,
+    "clinicName": "Clinic17",
+    "clinicAddress": "clinicAddress17",
+    "doctor": "Doctor17",
+    "email": "doctor17@example.com",
+    "preference": "Preference17",
+    "role": "user",
+    "isValid": true,
+    "accountName": "accountName17"
+  },
+  {
+    "id": 18,
+    "clinicName": "Clinic18",
+    "clinicAddress": "clinicAddress18",
+    "doctor": "Doctor18",
+    "email": "doctor18@example.com",
+    "preference": "Preference18",
+    "role": "user",
+    "isValid": false,
+    "accountName": "accountName18"
+  },
+  {
+    "id": 19,
+    "clinicName": "Clinic19",
+    "clinicAddress": "clinicAddress19",
+    "doctor": "Doctor19",
+    "email": "doctor19@example.com",
+    "preference": "Preference19",
+    "role": "user",
+    "isValid": false,
+    "accountName": "accountName19"
+  },  
+  {
+    "id": 20,
+    "clinicName": "Clinic20",
+    "clinicAddress": "clinicAddress20",
+    "doctor": "Doctor20",
+    "email": "doctor20@example.com",
+    "preference": "Preference20",
+    "role": "user",
+    "isValid": false,
+    "accountName": "accountName20"
+  }
+]
